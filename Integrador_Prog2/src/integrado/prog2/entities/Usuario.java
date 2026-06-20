@@ -7,7 +7,7 @@ public class Usuario extends Base {
     private String apellido;
     private String mail;
     private String celular;
-    private String contraseña;
+    private String contrasena;
     private Rol rol;
 
     public Usuario() {}
@@ -21,8 +21,8 @@ public class Usuario extends Base {
     public void setMail(String mail) { this.mail = mail; }
     public String getCelular() { return celular; }
     public void setCelular(String celular) { this.celular = celular; }
-    public String getContraseña() { return contraseña; }
-    public void setContraseña(String contraseña) { this.contraseña = contraseña; }
+    public String getContrasena() { return contrasena; }
+    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
     public Rol getRol() { return rol; }
     public void setRol(Rol rol) { this.rol = rol; }
 
