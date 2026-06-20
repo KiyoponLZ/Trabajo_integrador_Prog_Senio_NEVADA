@@ -53,7 +53,7 @@ public class UsuarioDAO implements IBaseDAO<Usuario> {
                 usu.setApellido(rs.getString("apellido"));
                 usu.setMail(rs.getString("mail"));
                 usu.setCelular(rs.getString("celular"));
-                usu.setContrasena(rs.getString("contraseña"));
+                usu.setContrasena(rs.getString("contrasena"));
 
                 // TRUCO: Convertimos el texto de MySQL de vuelta a Enum
                 usu.setRol(Rol.valueOf(rs.getString("rol")));

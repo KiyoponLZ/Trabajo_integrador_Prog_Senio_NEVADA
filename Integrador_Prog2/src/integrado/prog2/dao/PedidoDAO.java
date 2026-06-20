@@ -18,7 +18,7 @@ public class PedidoDAO implements IBaseDAO<Pedido> {
 
     @Override
     public void crear(Pedido pedido) {
-        String sqlPedido = "INSERT INTO pedido (fecha, estado, total, forma_pago, usuario_id) VALUES (?, ?, ?, ?, ?)";
+        String sqlPedido = "INSERT INTO pedido (fecha, estado, total, formaPago, usuario_id) VALUES (?, ?, ?, ?, ?)";
         String sqlDetalle = "INSERT INTO detalle_pedido (cantidad, subtotal, producto_id, pedido_id) VALUES (?, ?, ?, ?)";
         Connection conn = null;
 
@@ -90,7 +90,7 @@ public class PedidoDAO implements IBaseDAO<Pedido> {
                 ped.setFecha(rs.getDate("fecha").toLocalDate());
                 ped.setEstado(Estado.valueOf(rs.getString("estado")));
                 ped.setTotal(rs.getDouble("total"));
-                ped.setFormaPago(FormaPago.valueOf(rs.getString("forma_pago")));
+                ped.setFormaPago(FormaPago.valueOf(rs.getString("formaPago")));
 
                 Usuario usu = new Usuario();
                 usu.setId(rs.getLong("usuario_id"));
