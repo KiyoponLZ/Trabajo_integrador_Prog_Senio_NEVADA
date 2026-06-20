@@ -1,11 +1,15 @@
 package integrado.prog2;
 
 import integrado.prog2.dao.CategoriaDAO;
+import integrado.prog2.dao.PedidoDAO;
 import integrado.prog2.dao.ProductoDAO;
 import integrado.prog2.dao.UsuarioDAO;
 import integrado.prog2.entities.Categoria;
+import integrado.prog2.entities.Pedido;
 import integrado.prog2.entities.Producto;
 import integrado.prog2.entities.Usuario;
+import integrado.prog2.enums.Estado;
+import integrado.prog2.enums.FormaPago;
 import integrado.prog2.enums.Rol;
 
 import java.util.List;
@@ -17,6 +21,7 @@ public class Main {
         CategoriaDAO categoriaDAO = new CategoriaDAO();
         ProductoDAO productoDAO = new ProductoDAO();
         UsuarioDAO usuarioDAO = new UsuarioDAO();
+        PedidoDAO pedidoDAO = new PedidoDAO();
         int opcion = -1;
 
         do {
@@ -24,7 +29,7 @@ public class Main {
             System.out.println("1. Categorías");
             System.out.println("2. Productos");
             System.out.println("3. Usuarios");
-            System.out.println("4. Pedidos (En desarrollo...)");
+            System.out.println("4. Pedidos");
             System.out.println("0. Salir");
             System.out.print("Seleccione: ");
 
@@ -33,23 +38,12 @@ public class Main {
                 scanner.nextLine();
 
                 switch (opcion) {
-                    case 1:
-                        menuCategorias(scanner, categoriaDAO);
-                        break;
-                    case 2:
-                        menuProductos(scanner, productoDAO, categoriaDAO);
-                        break;
-                    case 3:
-                        menuUsuarios(scanner, usuarioDAO);
-                        break;
-                    case 4:
-                        System.out.println("¡Paciencia! Esta es la épica final y la armamos pronto.");
-                        break;
-                    case 0:
-                        System.out.println("¡Saliendo del sistema! Nos vemos.");
-                        break;
-                    default:
-                        System.out.println("Opción incorrecta. Ingresá un número del 0 al 4.");
+                    case 1: menuCategorias(scanner, categoriaDAO); break;
+                    case 2: menuProductos(scanner, productoDAO, categoriaDAO); break;
+                    case 3: menuUsuarios(scanner, usuarioDAO); break;
+                    case 4: menuPedidos(scanner, pedidoDAO, productoDAO, usuarioDAO); break;
+                    case 0: System.out.println("¡Saliendo del sistema! Nos vemos."); break;
+                    default: System.out.println("Opción incorrecta. Ingresá un número del 0 al 4.");
                 }
             } else {
                 System.out.println("Error: Debes ingresar un número.");
@@ -69,7 +63,7 @@ public class Main {
             System.out.println("2. Crear");
             System.out.println("3. Editar");
             System.out.println("4. Eliminar");
-            System.out.println("0. Volver al menú principal");
+            System.out.println("0. Volver");
             System.out.print("Seleccione: ");
 
             if (scanner.hasNextInt()) {
@@ -78,75 +72,38 @@ public class Main {
 
                 switch (opcionCat) {
                     case 1:
-                        System.out.println("\n--- Lista de Categorías ---");
                         List<Categoria> lista = dao.listar();
                         if (lista.isEmpty()) System.out.println("No hay categorías cargadas.");
                         else for (Categoria c : lista) System.out.println(c);
                         break;
                     case 2:
-                        System.out.print("Ingrese nombre (o '0' para cancelar): ");
+                        System.out.print("Nombre (o 0 para cancelar): ");
                         String nombre = scanner.nextLine();
-                        if (nombre.equals("0")) {
-                            System.out.println("Operación cancelada.");
-                            break;
-                        }
-
-                        System.out.print("Ingrese descripción: ");
-                        String desc = scanner.nextLine();
-                        if (!nombre.trim().isEmpty()) {
-                            dao.crear(new Categoria(nombre, desc));
-                        } else {
-                            System.out.println("El nombre no puede estar vacío.");
-                        }
+                        if (nombre.equals("0")) break;
+                        System.out.print("Descripción: ");
+                        dao.crear(new Categoria(nombre, scanner.nextLine()));
                         break;
                     case 3:
-                        System.out.print("ID de la categoría a editar (o 0 para cancelar): ");
-                        if (scanner.hasNextLong()) {
-                            Long idMod = scanner.nextLong();
-                            scanner.nextLine();
-                            if (idMod == 0) {
-                                System.out.println("Operación cancelada.");
-                                break;
-                            }
-
-                            System.out.print("Nuevo nombre: ");
-                            String nuevoNombre = scanner.nextLine();
-                            System.out.print("Nueva descripción: ");
-                            String nuevaDesc = scanner.nextLine();
-                            Categoria catMod = new Categoria(nuevoNombre, nuevaDesc);
-                            catMod.setId(idMod);
-                            dao.modificar(catMod);
-                        } else {
-                            System.out.println("ID inválido.");
-                            scanner.next();
-                        }
+                        System.out.print("ID a editar (0 para cancelar): ");
+                        Long idMod = scanner.nextLong(); scanner.nextLine();
+                        if (idMod == 0) break;
+                        System.out.print("Nuevo nombre: "); String nNombre = scanner.nextLine();
+                        System.out.print("Nueva descripción: "); String nDesc = scanner.nextLine();
+                        Categoria catMod = new Categoria(nNombre, nDesc);
+                        catMod.setId(idMod);
+                        dao.modificar(catMod);
                         break;
                     case 4:
-                        System.out.print("ID de la categoría a eliminar (o 0 para cancelar): ");
-                        if (scanner.hasNextLong()) {
-                            Long idElim = scanner.nextLong();
-                            scanner.nextLine();
-                            if (idElim == 0) {
-                                System.out.println("Operación cancelada.");
-                                break;
-                            }
-
-                            System.out.print("¿Seguro? (S/N): ");
-                            if (scanner.nextLine().equalsIgnoreCase("S")) dao.eliminar(idElim);
-                            else System.out.println("Cancelado.");
-                        } else {
-                            System.out.println("ID inválido.");
-                            scanner.next();
-                        }
+                        System.out.print("ID a eliminar (0 para cancelar): ");
+                        Long idElim = scanner.nextLong(); scanner.nextLine();
+                        if (idElim == 0) break;
+                        System.out.print("¿Seguro? (S/N): ");
+                        if (scanner.nextLine().equalsIgnoreCase("S")) dao.eliminar(idElim);
                         break;
-                    case 0:
-                        System.out.println("Volviendo...");
-                        break;
-                    default:
-                        System.out.println("Opción incorrecta.");
+                    case 0: break;
                 }
             } else {
-                System.out.println("Error: Debes ingresar un número.");
+                System.out.println("Error: Ingresá un número.");
                 scanner.next();
             }
         } while (opcionCat != 0);
@@ -161,7 +118,7 @@ public class Main {
             System.out.println("2. Crear");
             System.out.println("3. Editar");
             System.out.println("4. Eliminar");
-            System.out.println("0. Volver al menú principal");
+            System.out.println("0. Volver");
             System.out.print("Seleccione: ");
 
             if (scanner.hasNextInt()) {
@@ -170,129 +127,52 @@ public class Main {
 
                 switch (opcionProd) {
                     case 1:
-                        System.out.println("\n--- Lista de Productos ---");
                         List<Producto> lista = prodDao.listar();
-                        if (lista.isEmpty()) System.out.println("No hay productos cargados.");
+                        if (lista.isEmpty()) System.out.println("No hay productos.");
                         else for (Producto p : lista) System.out.println(p);
                         break;
                     case 2:
-                        System.out.print("Nombre del producto (o '0' para cancelar): ");
+                        System.out.print("Nombre (0 para cancelar): ");
                         String nombre = scanner.nextLine();
-                        if (nombre.equals("0")) {
-                            System.out.println("Operación cancelada.");
-                            break;
-                        }
-                        if (nombre.trim().isEmpty()) {
-                            System.out.println("El nombre no puede estar vacío.");
-                            break;
-                        }
-                        System.out.print("Precio: $");
-                        Double precio = scanner.nextDouble();
-                        System.out.print("Stock inicial: ");
-                        int stock = scanner.nextInt();
-                        scanner.nextLine();
+                        if (nombre.equals("0")) break;
 
-                        if (precio < 0 || stock < 0) {
-                            System.out.println("Error: El precio y el stock no pueden ser negativos.");
-                            break;
-                        }
+                        System.out.print("Precio: $"); Double precio = scanner.nextDouble();
+                        System.out.print("Stock: "); int stock = scanner.nextInt(); scanner.nextLine();
+                        System.out.print("Descripción: "); String desc = scanner.nextLine();
+                        System.out.print("ID Categoría: "); Long idCat = scanner.nextLong(); scanner.nextLine();
 
-                        System.out.print("Descripción: ");
-                        String desc = scanner.nextLine();
-
-                        System.out.println("\nCategorías disponibles:");
-                        for (Categoria c : catDao.listar()) {
-                            System.out.println("ID: " + c.getId() + " - " + c.getNombre());
-                        }
-                        System.out.print("Ingrese el ID de la Categoría: ");
-                        Long idCat = scanner.nextLong();
-                        scanner.nextLine();
-
-                        Producto nuevoProd = new Producto();
-                        nuevoProd.setNombre(nombre);
-                        nuevoProd.setPrecio(precio);
-                        nuevoProd.setStock(stock);
-                        nuevoProd.setDescripcion(desc);
-                        nuevoProd.setImagen("sin-imagen.png");
-                        nuevoProd.setDisponible(true);
-
-                        Categoria catAsignada = new Categoria();
-                        catAsignada.setId(idCat);
-                        nuevoProd.setCategoria(catAsignada);
-
-                        prodDao.crear(nuevoProd);
+                        Producto p = new Producto();
+                        p.setNombre(nombre); p.setPrecio(precio); p.setStock(stock); p.setDescripcion(desc);
+                        p.setImagen("sin-imagen.png"); p.setDisponible(true);
+                        Categoria c = new Categoria(); c.setId(idCat); p.setCategoria(c);
+                        prodDao.crear(p);
                         break;
                     case 3:
-                        System.out.print("Ingrese el ID del producto a editar (o 0 para cancelar): ");
-                        if (scanner.hasNextLong()) {
-                            Long idMod = scanner.nextLong();
-                            scanner.nextLine();
-                            if (idMod == 0) {
-                                System.out.println("Operación cancelada.");
-                                break;
-                            }
+                        System.out.print("ID a editar (0 para cancelar): ");
+                        Long idMod = scanner.nextLong(); scanner.nextLine();
+                        if (idMod == 0) break;
+                        System.out.print("Nuevo Nombre: "); String nNombre = scanner.nextLine();
+                        System.out.print("Nuevo Precio: $"); Double nPrecio = scanner.nextDouble();
+                        System.out.print("Nuevo Stock: "); int nStock = scanner.nextInt(); scanner.nextLine();
+                        System.out.print("Nuevo ID Categoría: "); Long nIdCat = scanner.nextLong(); scanner.nextLine();
 
-                            System.out.print("Nuevo nombre: ");
-                            String nNombre = scanner.nextLine();
-                            System.out.print("Nuevo precio: $");
-                            Double nPrecio = scanner.nextDouble();
-                            System.out.print("Nuevo stock: ");
-                            int nStock = scanner.nextInt();
-                            scanner.nextLine();
-                            System.out.print("Nuevo ID de Categoría: ");
-                            Long nIdCat = scanner.nextLong();
-                            scanner.nextLine();
-
-                            if (nPrecio < 0 || nStock < 0) {
-                                System.out.println("Error: Precio o stock negativos.");
-                                break;
-                            }
-
-                            Producto prodMod = new Producto();
-                            prodMod.setId(idMod);
-                            prodMod.setNombre(nNombre);
-                            prodMod.setPrecio(nPrecio);
-                            prodMod.setStock(nStock);
-                            prodMod.setDescripcion("");
-                            prodMod.setImagen("sin-imagen.png");
-                            prodMod.setDisponible(true);
-
-                            Categoria cMod = new Categoria();
-                            cMod.setId(nIdCat);
-                            prodMod.setCategoria(cMod);
-
-                            prodDao.modificar(prodMod);
-                        } else {
-                            System.out.println("ID inválido.");
-                            scanner.next();
-                        }
+                        Producto pMod = new Producto(); pMod.setId(idMod); pMod.setNombre(nNombre);
+                        pMod.setPrecio(nPrecio); pMod.setStock(nStock); pMod.setDescripcion("");
+                        pMod.setImagen("sin-imagen.png"); pMod.setDisponible(true);
+                        Categoria cMod = new Categoria(); cMod.setId(nIdCat); pMod.setCategoria(cMod);
+                        prodDao.modificar(pMod);
                         break;
                     case 4:
-                        System.out.print("ID del producto a eliminar (o 0 para cancelar): ");
-                        if (scanner.hasNextLong()) {
-                            Long idElim = scanner.nextLong();
-                            scanner.nextLine();
-                            if (idElim == 0) {
-                                System.out.println("Operación cancelada.");
-                                break;
-                            }
-
-                            System.out.print("¿Seguro? (S/N): ");
-                            if (scanner.nextLine().equalsIgnoreCase("S")) prodDao.eliminar(idElim);
-                            else System.out.println("Cancelado.");
-                        } else {
-                            System.out.println("ID inválido.");
-                            scanner.next();
-                        }
+                        System.out.print("ID a eliminar (0 para cancelar): ");
+                        Long idElim = scanner.nextLong(); scanner.nextLine();
+                        if (idElim == 0) break;
+                        System.out.print("¿Seguro? (S/N): ");
+                        if (scanner.nextLine().equalsIgnoreCase("S")) prodDao.eliminar(idElim);
                         break;
-                    case 0:
-                        System.out.println("Volviendo al menú principal...");
-                        break;
-                    default:
-                        System.out.println("Opción incorrecta.");
+                    case 0: break;
                 }
             } else {
-                System.out.println("Error: Debes ingresar un número.");
+                System.out.println("Error: Ingresá un número.");
                 scanner.next();
             }
         } while (opcionProd != 0);
@@ -307,7 +187,7 @@ public class Main {
             System.out.println("2. Crear");
             System.out.println("3. Editar");
             System.out.println("4. Eliminar");
-            System.out.println("0. Volver al menú principal");
+            System.out.println("0. Volver");
             System.out.print("Seleccione: ");
 
             if (scanner.hasNextInt()) {
@@ -316,113 +196,154 @@ public class Main {
 
                 switch (opcionUsu) {
                     case 1:
-                        System.out.println("\n--- Lista de Usuarios ---");
                         List<Usuario> lista = usuDao.listar();
-                        if (lista.isEmpty()) System.out.println("No hay usuarios cargados.");
+                        if (lista.isEmpty()) System.out.println("No hay usuarios.");
                         else for (Usuario u : lista) System.out.println(u);
                         break;
                     case 2:
-                        System.out.print("Nombre (o '0' para cancelar): ");
+                        System.out.print("Nombre (0 para cancelar): ");
                         String nombre = scanner.nextLine();
-                        if (nombre.equals("0")) {
-                            System.out.println("Operación cancelada.");
-                            break;
-                        }
+                        if (nombre.equals("0")) break;
+                        System.out.print("Apellido: "); String apellido = scanner.nextLine();
+                        System.out.print("Mail: "); String mail = scanner.nextLine();
+                        System.out.print("Celular: "); String celular = scanner.nextLine();
+                        System.out.print("Contraseña: "); String pass = scanner.nextLine();
+                        System.out.print("Rol (1 = ADMIN, 2 = USUARIO): "); int opRol = scanner.nextInt(); scanner.nextLine();
 
-                        System.out.print("Apellido: ");
-                        String apellido = scanner.nextLine();
-                        System.out.print("Mail: ");
-                        String mail = scanner.nextLine();
-                        System.out.print("Celular: ");
-                        String celular = scanner.nextLine();
-                        System.out.print("Contraseña: ");
-                        String pass = scanner.nextLine();
-
-                        System.out.println("Seleccione Rol (1 = ADMIN, 2 = USUARIO): ");
-                        int opcionRol = scanner.nextInt();
-                        scanner.nextLine();
-
-                        Rol rolAsignado = (opcionRol == 1) ? Rol.ADMIN : Rol.USUARIO;
-
-                        Usuario nuevoUsu = new Usuario();
-                        nuevoUsu.setNombre(nombre);
-                        nuevoUsu.setApellido(apellido);
-                        nuevoUsu.setMail(mail);
-                        nuevoUsu.setCelular(celular);
-                        nuevoUsu.setContrasena(pass);
-                        nuevoUsu.setRol(rolAsignado);
-
-                        usuDao.crear(nuevoUsu);
+                        Usuario u = new Usuario(); u.setNombre(nombre); u.setApellido(apellido);
+                        u.setMail(mail); u.setCelular(celular); u.setContrasena(pass);
+                        u.setRol((opRol == 1) ? Rol.ADMIN : Rol.USUARIO);
+                        usuDao.crear(u);
                         break;
                     case 3:
-                        System.out.print("Ingrese el ID del usuario a editar (o 0 para cancelar): ");
-                        if (scanner.hasNextLong()) {
-                            Long idMod = scanner.nextLong();
-                            scanner.nextLine();
-                            if (idMod == 0) {
-                                System.out.println("Operación cancelada.");
-                                break;
-                            }
+                        System.out.print("ID a editar (0 para cancelar): ");
+                        Long idMod = scanner.nextLong(); scanner.nextLine();
+                        if (idMod == 0) break;
+                        System.out.print("Nuevo Nombre: "); String nNombre = scanner.nextLine();
+                        System.out.print("Nuevo Apellido: "); String nApellido = scanner.nextLine();
+                        System.out.print("Nuevo Mail: "); String nMail = scanner.nextLine();
+                        System.out.print("Nuevo Celular: "); String nCelular = scanner.nextLine();
+                        System.out.print("Nueva Contraseña: "); String nPass = scanner.nextLine();
+                        System.out.print("Nuevo Rol (1 = ADMIN, 2 = USUARIO): "); int nOpRol = scanner.nextInt(); scanner.nextLine();
 
-                            System.out.print("Nuevo nombre: ");
-                            String nNombre = scanner.nextLine();
-                            System.out.print("Nuevo apellido: ");
-                            String nApellido = scanner.nextLine();
-                            System.out.print("Nuevo mail: ");
-                            String nMail = scanner.nextLine();
-                            System.out.print("Nuevo celular: ");
-                            String nCelular = scanner.nextLine();
-                            System.out.print("Nueva contraseña: ");
-                            String nPass = scanner.nextLine();
-                            System.out.println("Nuevo Rol (1 = ADMIN, 2 = USUARIO): ");
-                            int nOpcionRol = scanner.nextInt();
-                            scanner.nextLine();
-
-                            Rol nRolAsignado = (nOpcionRol == 1) ? Rol.ADMIN : Rol.USUARIO;
-
-                            Usuario usuMod = new Usuario();
-                            usuMod.setId(idMod);
-                            usuMod.setNombre(nNombre);
-                            usuMod.setApellido(nApellido);
-                            usuMod.setMail(nMail);
-                            usuMod.setCelular(nCelular);
-                            usuMod.setContrasena(nPass);
-                            usuMod.setRol(nRolAsignado);
-
-                            usuDao.modificar(usuMod);
-                        } else {
-                            System.out.println("ID inválido.");
-                            scanner.next();
-                        }
+                        Usuario uMod = new Usuario(); uMod.setId(idMod); uMod.setNombre(nNombre);
+                        uMod.setApellido(nApellido); uMod.setMail(nMail); uMod.setCelular(nCelular);
+                        uMod.setContrasena(nPass); uMod.setRol((nOpRol == 1) ? Rol.ADMIN : Rol.USUARIO);
+                        usuDao.modificar(uMod);
                         break;
                     case 4:
-                        System.out.print("ID del usuario a eliminar (o 0 para cancelar): ");
-                        if (scanner.hasNextLong()) {
-                            Long idElim = scanner.nextLong();
-                            scanner.nextLine();
-                            if (idElim == 0) {
-                                System.out.println("Operación cancelada.");
-                                break;
-                            }
-
-                            System.out.print("¿Seguro? (S/N): ");
-                            if (scanner.nextLine().equalsIgnoreCase("S")) usuDao.eliminar(idElim);
-                            else System.out.println("Cancelado.");
-                        } else {
-                            System.out.println("ID inválido.");
-                            scanner.next();
-                        }
+                        System.out.print("ID a eliminar (0 para cancelar): ");
+                        Long idElim = scanner.nextLong(); scanner.nextLine();
+                        if (idElim == 0) break;
+                        System.out.print("¿Seguro? (S/N): ");
+                        if (scanner.nextLine().equalsIgnoreCase("S")) usuDao.eliminar(idElim);
                         break;
-                    case 0:
-                        System.out.println("Volviendo al menú principal...");
-                        break;
-                    default:
-                        System.out.println("Opción incorrecta.");
+                    case 0: break;
                 }
             } else {
-                System.out.println("Error: Debes ingresar un número.");
+                System.out.println("Error: Ingresá un número.");
                 scanner.next();
             }
         } while (opcionUsu != 0);
+    }
+
+    // --- NUEVO SUBMENÚ DE PEDIDOS (CARRITO) ---
+    private static void menuPedidos(Scanner scanner, PedidoDAO pedDao, ProductoDAO prodDao, UsuarioDAO usuDao) {
+        int opcionPed = -1;
+        do {
+            System.out.println("\n--- GESTIÓN DE PEDIDOS ---");
+            System.out.println("1. Listar Pedidos");
+            System.out.println("2. Nuevo Pedido (CARRITO)");
+            System.out.println("3. Cambiar Estado de Pedido");
+            System.out.println("4. Eliminar Pedido");
+            System.out.println("0. Volver");
+            System.out.print("Seleccione: ");
+
+            if (scanner.hasNextInt()) {
+                opcionPed = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (opcionPed) {
+                    case 1:
+                        List<Pedido> lista = pedDao.listar();
+                        if (lista.isEmpty()) System.out.println("No hay pedidos registrados.");
+                        else for (Pedido p : lista) System.out.println("Pedido ID: " + p.getId() + " - Total: $" + p.getTotal() + " - Estado: " + p.getEstado());
+                        break;
+                    case 2:
+                        System.out.println("\n--- NUEVO PEDIDO ---");
+                        System.out.print("Ingrese ID del Usuario (0 para cancelar): ");
+                        Long idUsu = scanner.nextLong(); scanner.nextLine();
+                        if (idUsu == 0) break;
+
+                        Usuario cliente = new Usuario();
+                        cliente.setId(idUsu);
+                        Pedido nuevoPedido = new Pedido();
+                        nuevoPedido.setUsuario(cliente);
+                        nuevoPedido.setEstado(Estado.PENDIENTE);
+
+                        boolean agregando = true;
+                        while(agregando) {
+                            System.out.print("Ingrese ID del Producto a agregar (o 0 para Finalizar Compra): ");
+                            Long idProd = scanner.nextLong(); scanner.nextLine();
+
+                            if (idProd == 0) {
+                                agregando = false;
+                            } else {
+                                System.out.print("Cantidad: ");
+                                int cant = scanner.nextInt(); scanner.nextLine();
+
+                                // Para simplificar, le pedimos el precio acá (idealmente lo busca del prodDao)
+                                System.out.print("Precio Unitario del Producto: $");
+                                Double precioUnitario = scanner.nextDouble(); scanner.nextLine();
+
+                                Producto pAgregado = new Producto();
+                                pAgregado.setId(idProd);
+                                nuevoPedido.addDetallePedido(cant, precioUnitario, pAgregado);
+                                System.out.println("Producto agregado. Total actual: $" + nuevoPedido.getTotal());
+                            }
+                        }
+
+                        if (nuevoPedido.getDetalles().isEmpty()) {
+                            System.out.println("Pedido cancelado (Carrito vacío).");
+                        } else {
+                            System.out.println("Seleccione Forma de Pago (1. TARJETA, 2. EFECTIVO, 3. TRANSFERENCIA): ");
+                            int fp = scanner.nextInt(); scanner.nextLine();
+                            if (fp == 1) nuevoPedido.setFormaPago(FormaPago.TARJETA);
+                            else if (fp == 2) nuevoPedido.setFormaPago(FormaPago.EFECTIVO);
+                            else nuevoPedido.setFormaPago(FormaPago.TRANSFERENCIA);
+
+                            pedDao.crear(nuevoPedido);
+                        }
+                        break;
+                    case 3:
+                        System.out.print("ID del Pedido a editar (0 para cancelar): ");
+                        Long idMod = scanner.nextLong(); scanner.nextLine();
+                        if (idMod == 0) break;
+
+                        System.out.println("Nuevo Estado (1. PENDIENTE, 2. CONFIRMADO, 3. TERMINADO, 4. CANCELADO): ");
+                        int est = scanner.nextInt(); scanner.nextLine();
+                        Pedido pedMod = new Pedido();
+                        pedMod.setId(idMod);
+                        if (est == 1) pedMod.setEstado(Estado.PENDIENTE);
+                        else if (est == 2) pedMod.setEstado(Estado.CONFIRMADO);
+                        else if (est == 3) pedMod.setEstado(Estado.TERMINADO);
+                        else pedMod.setEstado(Estado.CANCELADO);
+
+                        pedDao.modificar(pedMod);
+                        break;
+                    case 4:
+                        System.out.print("ID a eliminar (0 para cancelar): ");
+                        Long idElim = scanner.nextLong(); scanner.nextLine();
+                        if (idElim == 0) break;
+                        System.out.print("¿Seguro? (S/N): ");
+                        if (scanner.nextLine().equalsIgnoreCase("S")) pedDao.eliminar(idElim);
+                        break;
+                    case 0: break;
+                }
+            } else {
+                System.out.println("Error: Ingresá un número.");
+                scanner.next();
+            }
+        } while (opcionPed != 0);
     }
 }

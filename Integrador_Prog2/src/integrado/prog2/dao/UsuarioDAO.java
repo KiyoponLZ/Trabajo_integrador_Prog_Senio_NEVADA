@@ -15,7 +15,7 @@ public class UsuarioDAO implements IBaseDAO<Usuario> {
 
     @Override
     public void crear(Usuario usuario) {
-        String sql = "INSERT INTO usuario (nombre, apellido, mail, celular, contraseña, rol) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO usuario (nombre, apellido, mail, celular, contrasena, rol) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = ConexionDB.getConexion();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -24,7 +24,7 @@ public class UsuarioDAO implements IBaseDAO<Usuario> {
             pstmt.setString(2, usuario.getApellido());
             pstmt.setString(3, usuario.getMail());
             pstmt.setString(4, usuario.getCelular());
-            pstmt.setString(5, usuario.getContraseña());
+            pstmt.setString(5, usuario.getContrasena());
 
             // TRUCO: Convertimos el Enum a texto para que MySQL lo entienda
             pstmt.setString(6, usuario.getRol().name());
@@ -53,7 +53,7 @@ public class UsuarioDAO implements IBaseDAO<Usuario> {
                 usu.setApellido(rs.getString("apellido"));
                 usu.setMail(rs.getString("mail"));
                 usu.setCelular(rs.getString("celular"));
-                usu.setContraseña(rs.getString("contraseña"));
+                usu.setContrasena(rs.getString("contraseña"));
 
                 // TRUCO: Convertimos el texto de MySQL de vuelta a Enum
                 usu.setRol(Rol.valueOf(rs.getString("rol")));
@@ -68,7 +68,7 @@ public class UsuarioDAO implements IBaseDAO<Usuario> {
 
     @Override
     public void modificar(Usuario usuario) {
-        String sql = "UPDATE usuario SET nombre=?, apellido=?, mail=?, celular=?, contraseña=?, rol=? WHERE id=?";
+        String sql = "UPDATE usuario SET nombre=?, apellido=?, mail=?, celular=?, contrasena=?, rol=? WHERE id=?";
         try (Connection conn = ConexionDB.getConexion();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -76,7 +76,7 @@ public class UsuarioDAO implements IBaseDAO<Usuario> {
             pstmt.setString(2, usuario.getApellido());
             pstmt.setString(3, usuario.getMail());
             pstmt.setString(4, usuario.getCelular());
-            pstmt.setString(5, usuario.getContraseña());
+            pstmt.setString(5, usuario.getContrasena());
             pstmt.setString(6, usuario.getRol().name());
             pstmt.setLong(7, usuario.getId());
 
