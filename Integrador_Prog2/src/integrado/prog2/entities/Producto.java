@@ -29,6 +29,13 @@ public class Producto extends Base {
 
     @Override
     public String toString() {
-        return "Producto [ID=" + getId() + ", Nombre=" + nombre + ", Precio=$" + precio + ", Stock=" + stock + ", Categoria=" + categoria.getNombre() + "]";
+        // Operador ternario: Si la categoría no es nula, sacamos el nombre. Si es nula, ponemos un texto por defecto.
+        String nombreCategoria = (this.categoria != null && this.categoria.getNombre() != null)
+                ? this.categoria.getNombre()
+                : "Sin categoría";
+
+        return "Producto [ID=" + this.getId() + ", Nombre=" + this.nombre +
+                ", Precio=$" + this.precio + ", Stock=" + this.stock +
+                ", Categoría=" + nombreCategoria + "]";
     }
 }

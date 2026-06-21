@@ -58,16 +58,22 @@ public class CategoriaDAO implements IBaseDAO<Categoria> {
 
     @Override
     public void modificar(Categoria categoria) {
-        String sql = "UPDATE categoria SET nombre = ?, descripcion = ? WHERE id = ?";
+        String sql = "UPDATE categoria SET nombre=?, descripcion=? WHERE id=? AND eliminado = false";
         try (Connection conn = ConexionDB.getConexion();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, categoria.getNombre());
             pstmt.setString(2, categoria.getDescripcion());
             pstmt.setLong(3, categoria.getId());
-            pstmt.executeUpdate();
 
-            System.out.println("Categoría actualizada con éxito.");
+            // ACÁ ESTÁ LA MAGIA NUEVA
+            int filasAfectadas = pstmt.executeUpdate();
+
+            if (filasAfectadas > 0) {
+                System.out.println("Categoría actualizada con éxito.");
+            } else {
+                System.out.println("Error: No se encontró la categoría con ID " + categoria.getId() + " o ya fue eliminada.");
+            }
 
         } catch (SQLException e) {
             System.out.println("Error al modificar la categoría: " + e.getMessage());

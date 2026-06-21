@@ -289,17 +289,26 @@ public class Main {
                             if (idProd == 0) {
                                 agregando = false;
                             } else {
-                                System.out.print("Cantidad: ");
-                                int cant = scanner.nextInt(); scanner.nextLine();
+                                // ACÁ SE APLICA LA BÚSQUEDA AUTOMÁTICA EN LA BASE DE DATOS
+                                Producto pAgregado = prodDao.buscarPorId(idProd);
 
-                                // Para simplificar, le pedimos el precio acá (idealmente lo busca del prodDao)
-                                System.out.print("Precio Unitario del Producto: $");
-                                Double precioUnitario = scanner.nextDouble(); scanner.nextLine();
+                                if (pAgregado == null) {
+                                    System.out.println("Error: El producto con ID " + idProd + " no existe.");
+                                } else {
+                                    System.out.print("Cantidad: ");
+                                    int cant = scanner.nextInt(); scanner.nextLine();
 
-                                Producto pAgregado = new Producto();
-                                pAgregado.setId(idProd);
-                                nuevoPedido.addDetallePedido(cant, precioUnitario, pAgregado);
-                                System.out.println("Producto agregado. Total actual: $" + nuevoPedido.getTotal());
+                                    // VALIDACIONES DE CANTIDAD Y STOCK
+                                    if (cant <= 0) {
+                                        System.out.println("Error: La cantidad debe ser mayor a 0.");
+                                    } else if (cant > pAgregado.getStock()) {
+                                        System.out.println("Error: ¡No hay stock suficiente! Solo quedan " + pAgregado.getStock() + " unidades.");
+                                    } else {
+                                        // AGREGAMOS AL PEDIDO EXTRAYENDO EL PRECIO REAL DESDE LA BASE
+                                        nuevoPedido.addDetallePedido(cant, pAgregado.getPrecio(), pAgregado);
+                                        System.out.println("Se agregaron " + cant + "x '" + pAgregado.getNombre() + "'. Total actual: $" + nuevoPedido.getTotal());
+                                    }
+                                }
                             }
                         }
 

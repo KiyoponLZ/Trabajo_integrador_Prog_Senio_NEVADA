@@ -80,7 +80,7 @@ public class ProductoDAO implements IBaseDAO<Producto> {
 
     @Override
     public void modificar(Producto producto) {
-        String sql = "UPDATE producto SET nombre=?, precio=?, descripcion=?, stock=?, imagen=?, disponible=?, categoria_id=? WHERE id=?";
+        String sql = "UPDATE producto SET nombre=?, precio=?, descripcion=?, stock=?, imagen=?, disponible=?, categoria_id=? WHERE id=? AND eliminado = false";
         try (Connection conn = ConexionDB.getConexion();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -93,8 +93,13 @@ public class ProductoDAO implements IBaseDAO<Producto> {
             pstmt.setLong(7, producto.getCategoria().getId());
             pstmt.setLong(8, producto.getId()); // El ID va al final por el WHERE
 
-            pstmt.executeUpdate();
-            System.out.println("Producto actualizado con éxito.");
+            int filasAfectadas = pstmt.executeUpdate();
+
+            if (filasAfectadas > 0) {
+                System.out.println("Producto actualizado con éxito.");
+            } else {
+                System.out.println("Error: No se encontró el producto con ID " + producto.getId() + " o ya fue eliminado.");
+            }
 
         } catch (SQLException e) {
             System.out.println("Error al modificar el producto: " + e.getMessage());
@@ -109,11 +114,42 @@ public class ProductoDAO implements IBaseDAO<Producto> {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setLong(1, id);
-            pstmt.executeUpdate();
-            System.out.println("Producto eliminado del sistema (baja lógica).");
+
+            int filasAfectadas = pstmt.executeUpdate();
+
+            if (filasAfectadas > 0) {
+                System.out.println("Producto eliminado del sistema (baja lógica).");
+            } else {
+                System.out.println("Error: No se encontró el producto con ID " + id + " o ya fue eliminado.");
+            }
 
         } catch (SQLException e) {
             System.out.println("Error al eliminar el producto: " + e.getMessage());
         }
+    }
+
+    // NUEVO MÉTODO PARA EL CARRITO: Busca un producto por su ID para extraer su precio real
+    public Producto buscarPorId(Long id) {
+        String sql = "SELECT * FROM producto WHERE id = ? AND eliminado = false";
+        Producto productoEncontrado = null;
+
+        try (Connection conn = ConexionDB.getConexion();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    productoEncontrado = new Producto();
+                    productoEncontrado.setId(rs.getLong("id"));
+                    productoEncontrado.setNombre(rs.getString("nombre"));
+                    productoEncontrado.setPrecio(rs.getDouble("precio"));
+                    productoEncontrado.setStock(rs.getInt("stock"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al buscar el producto: " + e.getMessage());
+        }
+        return productoEncontrado;
     }
 }
