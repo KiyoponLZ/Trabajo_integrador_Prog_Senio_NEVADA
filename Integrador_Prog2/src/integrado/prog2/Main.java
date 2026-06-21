@@ -275,6 +275,18 @@ public class Main {
                         break;
                     case 2:
                         System.out.println("\n--- NUEVO PEDIDO ---");
+
+                        // Mostramos los usuarios disponibles para que el operador elija
+                        List<Usuario> usuariosDisponibles = usuService.listar();
+                        if (usuariosDisponibles.isEmpty()) {
+                            System.out.println("No hay usuarios registrados. Creá uno primero.");
+                            break;
+                        }
+                        System.out.println("Usuarios disponibles:");
+                        for (Usuario us : usuariosDisponibles) {
+                            System.out.println("  [" + us.getId() + "] " + us.getNombre() + " " + us.getApellido() + " (" + us.getMail() + ")");
+                        }
+
                         System.out.print("Ingrese ID del Usuario (0 para cancelar): ");
                         Long idUsu = scanner.nextLong(); scanner.nextLine();
                         if (idUsu == 0) break;
@@ -282,6 +294,7 @@ public class Main {
                         try {
                             // Validamos que el usuario exista usando el servicio (Puntos 3 y 6)
                             Usuario cliente = usuService.buscarPorId(idUsu);
+                            System.out.println("✔ Cliente seleccionado: " + cliente.getNombre() + " " + cliente.getApellido());
 
                             Pedido nuevoPedido = new Pedido();
                             nuevoPedido.setUsuario(cliente);
@@ -289,6 +302,17 @@ public class Main {
 
                             boolean agregando = true;
                             while (agregando) {
+                                // Mostramos los productos disponibles en cada vuelta del carrito
+                                List<Producto> productosDisponibles = prodService.listar();
+                                if (productosDisponibles.isEmpty()) {
+                                    System.out.println("No hay productos disponibles.");
+                                    break;
+                                }
+                                System.out.println("\nProductos disponibles:");
+                                for (Producto prod : productosDisponibles) {
+                                    System.out.println("  [" + prod.getId() + "] " + prod.getNombre() + " - $" + prod.getPrecio() + " (Stock: " + prod.getStock() + ")");
+                                }
+
                                 System.out.print("Ingrese ID del Producto a agregar (o 0 para Finalizar Compra): ");
                                 Long idProd = scanner.nextLong(); scanner.nextLine();
 
