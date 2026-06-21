@@ -102,4 +102,23 @@ public class UsuarioDAO implements IBaseDAO<Usuario> {
             System.out.println("Error al eliminar el usuario: " + e.getMessage());
         }
     }
+    // NUEVO MÉTODO: Busca un usuario por ID para verificar su existencia
+    public Usuario buscarPorId(Long id) {
+        String sql = "SELECT * FROM usuario WHERE id = ? AND eliminado = false";
+        try (Connection conn = ConexionDB.getConexion();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setId(rs.getLong("id"));
+                    u.setNombre(rs.getString("nombre"));
+                    return u;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al buscar usuario: " + e.getMessage());
+        }
+        return null;
+    }
 }
