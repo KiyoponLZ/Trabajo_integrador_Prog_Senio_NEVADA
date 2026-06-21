@@ -1,9 +1,9 @@
 package integrado.prog2;
 
-import integrado.prog2.dao.CategoriaDAO;
-import integrado.prog2.dao.PedidoDAO;
-import integrado.prog2.dao.ProductoDAO;
-import integrado.prog2.dao.UsuarioDAO;
+import integrado.prog2.service.CategoriaService;
+import integrado.prog2.service.PedidoService;
+import integrado.prog2.service.ProductoService;
+import integrado.prog2.service.UsuarioService;
 import integrado.prog2.entities.Categoria;
 import integrado.prog2.entities.Pedido;
 import integrado.prog2.entities.Producto;
@@ -11,6 +11,7 @@ import integrado.prog2.entities.Usuario;
 import integrado.prog2.enums.Estado;
 import integrado.prog2.enums.FormaPago;
 import integrado.prog2.enums.Rol;
+import integrado.prog2.exceptions.EntityNotFoundException;
 
 import java.util.List;
 import java.util.Scanner;
@@ -18,10 +19,13 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        CategoriaDAO categoriaDAO = new CategoriaDAO();
-        ProductoDAO productoDAO = new ProductoDAO();
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        PedidoDAO pedidoDAO = new PedidoDAO();
+
+        // ¡MAGIA! Ahora instanciamos los Servicios (Punto 5)
+        CategoriaService categoriaService = new CategoriaService();
+        ProductoService productoService = new ProductoService();
+        UsuarioService usuarioService = new UsuarioService();
+        PedidoService pedidoService = new PedidoService();
+
         int opcion = -1;
 
         do {
@@ -38,10 +42,10 @@ public class Main {
                 scanner.nextLine();
 
                 switch (opcion) {
-                    case 1: menuCategorias(scanner, categoriaDAO); break;
-                    case 2: menuProductos(scanner, productoDAO, categoriaDAO); break;
-                    case 3: menuUsuarios(scanner, usuarioDAO); break;
-                    case 4: menuPedidos(scanner, pedidoDAO, productoDAO, usuarioDAO); break;
+                    case 1: menuCategorias(scanner, categoriaService); break;
+                    case 2: menuProductos(scanner, productoService, categoriaService); break;
+                    case 3: menuUsuarios(scanner, usuarioService); break;
+                    case 4: menuPedidos(scanner, pedidoService, productoService, usuarioService); break;
                     case 0: System.out.println("¡Saliendo del sistema! Nos vemos."); break;
                     default: System.out.println("Opción incorrecta. Ingresá un número del 0 al 4.");
                 }
@@ -55,7 +59,7 @@ public class Main {
     }
 
     // --- SUBMENÚ DE CATEGORÍAS ---
-    private static void menuCategorias(Scanner scanner, CategoriaDAO dao) {
+    private static void menuCategorias(Scanner scanner, CategoriaService service) {
         int opcionCat = -1;
         do {
             System.out.println("\n--- GESTIÓN DE CATEGORÍAS ---");
@@ -72,7 +76,7 @@ public class Main {
 
                 switch (opcionCat) {
                     case 1:
-                        List<Categoria> lista = dao.listar();
+                        List<Categoria> lista = service.listar();
                         if (lista.isEmpty()) System.out.println("No hay categorías cargadas.");
                         else for (Categoria c : lista) System.out.println(c);
                         break;
@@ -81,7 +85,7 @@ public class Main {
                         String nombre = scanner.nextLine();
                         if (nombre.equals("0")) break;
                         System.out.print("Descripción: ");
-                        dao.crear(new Categoria(nombre, scanner.nextLine()));
+                        service.crear(new Categoria(nombre, scanner.nextLine()));
                         break;
                     case 3:
                         System.out.print("ID a editar (0 para cancelar): ");
@@ -91,14 +95,14 @@ public class Main {
                         System.out.print("Nueva descripción: "); String nDesc = scanner.nextLine();
                         Categoria catMod = new Categoria(nNombre, nDesc);
                         catMod.setId(idMod);
-                        dao.modificar(catMod);
+                        service.modificar(catMod);
                         break;
                     case 4:
                         System.out.print("ID a eliminar (0 para cancelar): ");
                         Long idElim = scanner.nextLong(); scanner.nextLine();
                         if (idElim == 0) break;
                         System.out.print("¿Seguro? (S/N): ");
-                        if (scanner.nextLine().equalsIgnoreCase("S")) dao.eliminar(idElim);
+                        if (scanner.nextLine().equalsIgnoreCase("S")) service.eliminar(idElim);
                         break;
                     case 0: break;
                 }
@@ -110,7 +114,7 @@ public class Main {
     }
 
     // --- SUBMENÚ DE PRODUCTOS ---
-    private static void menuProductos(Scanner scanner, ProductoDAO prodDao, CategoriaDAO catDao) {
+    private static void menuProductos(Scanner scanner, ProductoService prodService, CategoriaService catService) {
         int opcionProd = -1;
         do {
             System.out.println("\n--- GESTIÓN DE PRODUCTOS ---");
@@ -127,7 +131,7 @@ public class Main {
 
                 switch (opcionProd) {
                     case 1:
-                        List<Producto> lista = prodDao.listar();
+                        List<Producto> lista = prodService.listar();
                         if (lista.isEmpty()) System.out.println("No hay productos.");
                         else for (Producto p : lista) System.out.println(p);
                         break;
@@ -145,7 +149,7 @@ public class Main {
                         p.setNombre(nombre); p.setPrecio(precio); p.setStock(stock); p.setDescripcion(desc);
                         p.setImagen("sin-imagen.png"); p.setDisponible(true);
                         Categoria c = new Categoria(); c.setId(idCat); p.setCategoria(c);
-                        prodDao.crear(p);
+                        prodService.crear(p);
                         break;
                     case 3:
                         System.out.print("ID a editar (0 para cancelar): ");
@@ -160,14 +164,14 @@ public class Main {
                         pMod.setPrecio(nPrecio); pMod.setStock(nStock); pMod.setDescripcion("");
                         pMod.setImagen("sin-imagen.png"); pMod.setDisponible(true);
                         Categoria cMod = new Categoria(); cMod.setId(nIdCat); pMod.setCategoria(cMod);
-                        prodDao.modificar(pMod);
+                        prodService.modificar(pMod);
                         break;
                     case 4:
                         System.out.print("ID a eliminar (0 para cancelar): ");
                         Long idElim = scanner.nextLong(); scanner.nextLine();
                         if (idElim == 0) break;
                         System.out.print("¿Seguro? (S/N): ");
-                        if (scanner.nextLine().equalsIgnoreCase("S")) prodDao.eliminar(idElim);
+                        if (scanner.nextLine().equalsIgnoreCase("S")) prodService.eliminar(idElim);
                         break;
                     case 0: break;
                 }
@@ -179,7 +183,7 @@ public class Main {
     }
 
     // --- SUBMENÚ DE USUARIOS ---
-    private static void menuUsuarios(Scanner scanner, UsuarioDAO usuDao) {
+    private static void menuUsuarios(Scanner scanner, UsuarioService usuService) {
         int opcionUsu = -1;
         do {
             System.out.println("\n--- GESTIÓN DE USUARIOS ---");
@@ -196,7 +200,7 @@ public class Main {
 
                 switch (opcionUsu) {
                     case 1:
-                        List<Usuario> lista = usuDao.listar();
+                        List<Usuario> lista = usuService.listar();
                         if (lista.isEmpty()) System.out.println("No hay usuarios.");
                         else for (Usuario u : lista) System.out.println(u);
                         break;
@@ -213,7 +217,7 @@ public class Main {
                         Usuario u = new Usuario(); u.setNombre(nombre); u.setApellido(apellido);
                         u.setMail(mail); u.setCelular(celular); u.setContrasena(pass);
                         u.setRol((opRol == 1) ? Rol.ADMIN : Rol.USUARIO);
-                        usuDao.crear(u);
+                        usuService.crear(u);
                         break;
                     case 3:
                         System.out.print("ID a editar (0 para cancelar): ");
@@ -229,14 +233,14 @@ public class Main {
                         Usuario uMod = new Usuario(); uMod.setId(idMod); uMod.setNombre(nNombre);
                         uMod.setApellido(nApellido); uMod.setMail(nMail); uMod.setCelular(nCelular);
                         uMod.setContrasena(nPass); uMod.setRol((nOpRol == 1) ? Rol.ADMIN : Rol.USUARIO);
-                        usuDao.modificar(uMod);
+                        usuService.modificar(uMod);
                         break;
                     case 4:
                         System.out.print("ID a eliminar (0 para cancelar): ");
                         Long idElim = scanner.nextLong(); scanner.nextLine();
                         if (idElim == 0) break;
                         System.out.print("¿Seguro? (S/N): ");
-                        if (scanner.nextLine().equalsIgnoreCase("S")) usuDao.eliminar(idElim);
+                        if (scanner.nextLine().equalsIgnoreCase("S")) usuService.eliminar(idElim);
                         break;
                     case 0: break;
                 }
@@ -248,7 +252,7 @@ public class Main {
     }
 
     // --- NUEVO SUBMENÚ DE PEDIDOS (CARRITO) ---
-    private static void menuPedidos(Scanner scanner, PedidoDAO pedDao, ProductoDAO prodDao, UsuarioDAO usuDao) {
+    private static void menuPedidos(Scanner scanner, PedidoService pedService, ProductoService prodService, UsuarioService usuService) {
         int opcionPed = -1;
         do {
             System.out.println("\n--- GESTIÓN DE PEDIDOS ---");
@@ -265,7 +269,7 @@ public class Main {
 
                 switch (opcionPed) {
                     case 1:
-                        List<Pedido> lista = pedDao.listar();
+                        List<Pedido> lista = pedService.listar();
                         if (lista.isEmpty()) System.out.println("No hay pedidos registrados.");
                         else for (Pedido p : lista) System.out.println("Pedido ID: " + p.getId() + " - Total: $" + p.getTotal() + " - Estado: " + p.getEstado());
                         break;
@@ -275,53 +279,58 @@ public class Main {
                         Long idUsu = scanner.nextLong(); scanner.nextLine();
                         if (idUsu == 0) break;
 
-                        Usuario cliente = new Usuario();
-                        cliente.setId(idUsu);
-                        Pedido nuevoPedido = new Pedido();
-                        nuevoPedido.setUsuario(cliente);
-                        nuevoPedido.setEstado(Estado.PENDIENTE);
+                        try {
+                            // Validamos que el usuario exista usando el servicio (Puntos 3 y 6)
+                            Usuario cliente = usuService.buscarPorId(idUsu);
 
-                        boolean agregando = true;
-                        while(agregando) {
-                            System.out.print("Ingrese ID del Producto a agregar (o 0 para Finalizar Compra): ");
-                            Long idProd = scanner.nextLong(); scanner.nextLine();
+                            Pedido nuevoPedido = new Pedido();
+                            nuevoPedido.setUsuario(cliente);
+                            nuevoPedido.setEstado(Estado.PENDIENTE);
 
-                            if (idProd == 0) {
-                                agregando = false;
-                            } else {
-                                // ACÁ SE APLICA LA BÚSQUEDA AUTOMÁTICA EN LA BASE DE DATOS
-                                Producto pAgregado = prodDao.buscarPorId(idProd);
+                            boolean agregando = true;
+                            while (agregando) {
+                                System.out.print("Ingrese ID del Producto a agregar (o 0 para Finalizar Compra): ");
+                                Long idProd = scanner.nextLong(); scanner.nextLine();
 
-                                if (pAgregado == null) {
-                                    System.out.println("Error: El producto con ID " + idProd + " no existe.");
+                                if (idProd == 0) {
+                                    agregando = false;
                                 } else {
-                                    System.out.print("Cantidad: ");
-                                    int cant = scanner.nextInt(); scanner.nextLine();
+                                    try {
+                                        // Buscamos el producto, si no existe tira nuestra EntityNotFoundException
+                                        Producto pAgregado = prodService.buscarPorId(idProd);
 
-                                    // VALIDACIONES DE CANTIDAD Y STOCK
-                                    if (cant <= 0) {
-                                        System.out.println("Error: La cantidad debe ser mayor a 0.");
-                                    } else if (cant > pAgregado.getStock()) {
-                                        System.out.println("Error: ¡No hay stock suficiente! Solo quedan " + pAgregado.getStock() + " unidades.");
-                                    } else {
-                                        // AGREGAMOS AL PEDIDO EXTRAYENDO EL PRECIO REAL DESDE LA BASE
-                                        nuevoPedido.addDetallePedido(cant, pAgregado.getPrecio(), pAgregado);
-                                        System.out.println("Se agregaron " + cant + "x '" + pAgregado.getNombre() + "'. Total actual: $" + nuevoPedido.getTotal());
+                                        System.out.print("Cantidad: ");
+                                        int cant = scanner.nextInt(); scanner.nextLine();
+
+                                        if (cant <= 0) {
+                                            System.out.println("Error: La cantidad debe ser mayor a 0.");
+                                        } else if (cant > pAgregado.getStock()) {
+                                            System.out.println("Error: ¡No hay stock suficiente! Solo quedan " + pAgregado.getStock() + " unidades.");
+                                        } else {
+                                            nuevoPedido.addDetallePedido(cant, pAgregado.getPrecio(), pAgregado);
+                                            System.out.println("Se agregaron " + cant + "x '" + pAgregado.getNombre() + "'. Total actual: $" + nuevoPedido.getTotal());
+                                        }
+                                    } catch (EntityNotFoundException ex) {
+                                        System.out.println("Error: " + ex.getMessage());
                                     }
                                 }
                             }
-                        }
 
-                        if (nuevoPedido.getDetalles().isEmpty()) {
-                            System.out.println("Pedido cancelado (Carrito vacío).");
-                        } else {
-                            System.out.println("Seleccione Forma de Pago (1. TARJETA, 2. EFECTIVO, 3. TRANSFERENCIA): ");
-                            int fp = scanner.nextInt(); scanner.nextLine();
-                            if (fp == 1) nuevoPedido.setFormaPago(FormaPago.TARJETA);
-                            else if (fp == 2) nuevoPedido.setFormaPago(FormaPago.EFECTIVO);
-                            else nuevoPedido.setFormaPago(FormaPago.TRANSFERENCIA);
+                            if (nuevoPedido.getDetalles().isEmpty()) {
+                                System.out.println("Pedido cancelado (Carrito vacío).");
+                            } else {
+                                System.out.println("Seleccione Forma de Pago (1. TARJETA, 2. EFECTIVO, 3. TRANSFERENCIA): ");
+                                int fp = scanner.nextInt(); scanner.nextLine();
+                                if (fp == 1) nuevoPedido.setFormaPago(FormaPago.TARJETA);
+                                else if (fp == 2) nuevoPedido.setFormaPago(FormaPago.EFECTIVO);
+                                else nuevoPedido.setFormaPago(FormaPago.TRANSFERENCIA);
 
-                            pedDao.crear(nuevoPedido);
+                                // El servicio se encarga de las últimas validaciones antes del DAO
+                                pedService.crear(nuevoPedido);
+                            }
+                        } catch (EntityNotFoundException e) {
+                            // Atrapamos el error si el usuario no existe
+                            System.out.println("Error al iniciar el pedido: " + e.getMessage());
                         }
                         break;
                     case 3:
@@ -338,14 +347,14 @@ public class Main {
                         else if (est == 3) pedMod.setEstado(Estado.TERMINADO);
                         else pedMod.setEstado(Estado.CANCELADO);
 
-                        pedDao.modificar(pedMod);
+                        pedService.modificar(pedMod);
                         break;
                     case 4:
                         System.out.print("ID a eliminar (0 para cancelar): ");
                         Long idElim = scanner.nextLong(); scanner.nextLine();
                         if (idElim == 0) break;
                         System.out.print("¿Seguro? (S/N): ");
-                        if (scanner.nextLine().equalsIgnoreCase("S")) pedDao.eliminar(idElim);
+                        if (scanner.nextLine().equalsIgnoreCase("S")) pedService.eliminar(idElim);
                         break;
                     case 0: break;
                 }
