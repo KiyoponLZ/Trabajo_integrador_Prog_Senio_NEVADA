@@ -14,12 +14,12 @@ public class ConexionDB {
     public static Connection getConexion() {
         Connection conexion = null;
         try {
-            // Intentamos enchufar el cable
+            // Intentamos conectar
             conexion = DriverManager.getConnection(URL, USER, PASSWORD);
             System.out.println("¡Conexión a MySQL exitosa!");
         } catch (SQLException e) {
             // Si algo falla (XAMPP apagado, mal el nombre, etc), nos avisa acá
-            System.out.println("Upa, error al conectar: " + e.getMessage());
+            System.out.println("PROFE PERDON, error al conectar: " + e.getMessage());
         }
         return conexion;
     }

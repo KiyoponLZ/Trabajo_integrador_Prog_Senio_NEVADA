@@ -7,7 +7,7 @@ public abstract class Base {
     private boolean eliminado;
     private LocalDateTime createdAt; // Guarda el momento exacto en el que se creó el registro
 
-    // Constructor vacío (siempre es buena práctica tenerlo)
+    // Constructor vacío
     public Base() {
         // Por defecto, cuando creamos algo, no está eliminado y guardamos la fecha actual
         this.eliminado = false;
