@@ -20,7 +20,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // ¡MAGIA! Ahora instanciamos los Servicios (Punto 5)
+        // Ahora instanciamos los Servicios (Punto 5)
         CategoriaService categoriaService = new CategoriaService();
         ProductoService productoService = new ProductoService();
         UsuarioService usuarioService = new UsuarioService();
