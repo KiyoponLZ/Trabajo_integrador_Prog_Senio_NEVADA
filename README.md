@@ -13,7 +13,7 @@ Este proyecto consiste en un sistema enfocado en la gestión de un negocio de co
 
 ## Documentación
 
-- https://docs.google.com/document/d/1folJuZNXDK2PdzOmOCYilHBiD5gcilHN2lJXaKPb-UA/edit?usp=sharing
+- https://drive.google.com/file/d/1ewDs1Pa3PGvW9lRV5IG7I9yz2VTcuLun/view?usp=sharing
 
 ---
 
