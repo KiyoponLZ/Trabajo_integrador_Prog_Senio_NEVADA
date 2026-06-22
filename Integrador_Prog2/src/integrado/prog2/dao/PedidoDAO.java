@@ -32,6 +32,7 @@ public class PedidoDAO implements IBaseDAO<Pedido> {
                 pstmtPedido.setDouble(3, pedido.getTotal());
                 pstmtPedido.setString(4, pedido.getFormaPago().name());
                 pstmtPedido.setLong(5, pedido.getUsuario().getId());
+                //lo manda a la base de datos y la ejecuta
                 pstmtPedido.executeUpdate();
 
                 try (ResultSet rs = pstmtPedido.getGeneratedKeys()) {

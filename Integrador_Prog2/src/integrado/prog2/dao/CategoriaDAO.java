@@ -14,12 +14,16 @@ public class CategoriaDAO implements IBaseDAO<Categoria> {
 
     @Override
     public void crear(Categoria categoria) {
-        String sql = "INSERT INTO categoria (nombre, descripcion) VALUES (?, ?)";
+        String sql = "INSERT INTO categoria (nombre, descripcion) VALUES (?, ?)"; //? son como plantillas para meter datos de forma segura
+        //Abre la conexión de mysql y prepara la consulta
         try (Connection conn = ConexionDB.getConexion();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
+            //reemplaza el primer y segundo signo de pregunta con el nombre y la descripción del objeto categoría
             pstmt.setString(1, categoria.getNombre());
             pstmt.setString(2, categoria.getDescripcion());
+
+            //Ejecuta la orden en mysql para que impacte en la tabla, si sale algo mal salta al catch
             pstmt.executeUpdate();
 
             System.out.println("Categoría '" + categoria.getNombre() + "' creada con éxito.");
@@ -37,6 +41,7 @@ public class CategoriaDAO implements IBaseDAO<Categoria> {
 
         try (Connection conn = ConexionDB.getConexion();
              PreparedStatement pstmt = conn.prepareStatement(sql);
+             //Tabla virtual temporal donde Java guarda todas las filas que devolvió mysql
              ResultSet rs = pstmt.executeQuery()) {
 
             // rs.next() va fila por fila de los resultados que nos devolvió MySQL
@@ -66,7 +71,7 @@ public class CategoriaDAO implements IBaseDAO<Categoria> {
             pstmt.setString(2, categoria.getDescripcion());
             pstmt.setLong(3, categoria.getId());
 
-            // ACÁ ESTÁ LA MAGIA NUEVA
+            // Cuando hace modificaciones devuelve un número que indica a cuantas filas les cambio los datos en mysql
             int filasAfectadas = pstmt.executeUpdate();
 
             if (filasAfectadas > 0) {

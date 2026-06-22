@@ -25,12 +25,12 @@ DROP TABLE IF EXISTS `categoria`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `categoria` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `eliminado` tinyint(1) DEFAULT 0,
-  `createdAt` datetime DEFAULT current_timestamp(),
-  `nombre` varchar(100) NOT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+                             `id` bigint(20) NOT NULL AUTO_INCREMENT,
+                             `eliminado` tinyint(1) DEFAULT 0,
+                             `createdAt` datetime DEFAULT current_timestamp(),
+                             `nombre` varchar(100) NOT NULL,
+                             `descripcion` varchar(255) DEFAULT NULL,
+                             PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -52,18 +52,18 @@ DROP TABLE IF EXISTS `detalle_pedido`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `detalle_pedido` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `eliminado` tinyint(1) DEFAULT 0,
-  `createdAt` datetime DEFAULT current_timestamp(),
-  `cantidad` int(11) NOT NULL,
-  `subtotal` double NOT NULL,
-  `pedido_id` bigint(20) NOT NULL,
-  `producto_id` bigint(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `pedido_id` (`pedido_id`),
-  KEY `producto_id` (`producto_id`),
-  CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedido` (`id`),
-  CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `producto` (`id`)
+                                  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+                                  `eliminado` tinyint(1) DEFAULT 0,
+                                  `createdAt` datetime DEFAULT current_timestamp(),
+                                  `cantidad` int(11) NOT NULL,
+                                  `subtotal` double NOT NULL,
+                                  `pedido_id` bigint(20) NOT NULL,
+                                  `producto_id` bigint(20) NOT NULL,
+                                  PRIMARY KEY (`id`),
+                                  KEY `pedido_id` (`pedido_id`),
+                                  KEY `producto_id` (`producto_id`),
+                                  CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedido` (`id`),
+                                  CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `producto` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -85,17 +85,17 @@ DROP TABLE IF EXISTS `pedido`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pedido` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `eliminado` tinyint(1) DEFAULT 0,
-  `createdAt` datetime DEFAULT current_timestamp(),
-  `fecha` date NOT NULL,
-  `estado` enum('PENDIENTE','CONFIRMADO','TERMINADO','CANCELADO') NOT NULL,
-  `total` double NOT NULL DEFAULT 0,
-  `formaPago` enum('TARJETA','TRANSFERENCIA','EFECTIVO') NOT NULL,
-  `usuario_id` bigint(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `usuario_id` (`usuario_id`),
-  CONSTRAINT `pedido_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`)
+                          `id` bigint(20) NOT NULL AUTO_INCREMENT,
+                          `eliminado` tinyint(1) DEFAULT 0,
+                          `createdAt` datetime DEFAULT current_timestamp(),
+                          `fecha` date NOT NULL,
+                          `estado` enum('PENDIENTE','CONFIRMADO','TERMINADO','CANCELADO') NOT NULL,
+                          `total` double NOT NULL DEFAULT 0,
+                          `formaPago` enum('TARJETA','TRANSFERENCIA','EFECTIVO') NOT NULL,
+                          `usuario_id` bigint(20) NOT NULL,
+                          PRIMARY KEY (`id`),
+                          KEY `usuario_id` (`usuario_id`),
+                          CONSTRAINT `pedido_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -117,19 +117,19 @@ DROP TABLE IF EXISTS `producto`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `producto` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `eliminado` tinyint(1) DEFAULT 0,
-  `createdAt` datetime DEFAULT current_timestamp(),
-  `nombre` varchar(100) NOT NULL,
-  `precio` double NOT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
-  `stock` int(11) NOT NULL,
-  `imagen` varchar(255) DEFAULT NULL,
-  `disponible` tinyint(1) DEFAULT 1,
-  `categoria_id` bigint(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `categoria_id` (`categoria_id`),
-  CONSTRAINT `producto_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `categoria` (`id`)
+                            `id` bigint(20) NOT NULL AUTO_INCREMENT,
+                            `eliminado` tinyint(1) DEFAULT 0,
+                            `createdAt` datetime DEFAULT current_timestamp(),
+                            `nombre` varchar(100) NOT NULL,
+                            `precio` double NOT NULL,
+                            `descripcion` varchar(255) DEFAULT NULL,
+                            `stock` int(11) NOT NULL,
+                            `imagen` varchar(255) DEFAULT NULL,
+                            `disponible` tinyint(1) DEFAULT 1,
+                            `categoria_id` bigint(20) NOT NULL,
+                            PRIMARY KEY (`id`),
+                            KEY `categoria_id` (`categoria_id`),
+                            CONSTRAINT `producto_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `categoria` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -151,17 +151,17 @@ DROP TABLE IF EXISTS `usuario`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `usuario` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `eliminado` tinyint(1) DEFAULT 0,
-  `createdAt` datetime DEFAULT current_timestamp(),
-  `nombre` varchar(100) NOT NULL,
-  `apellido` varchar(100) NOT NULL,
-  `mail` varchar(150) NOT NULL,
-  `celular` varchar(20) DEFAULT NULL,
-  `contrasena` varchar(255) DEFAULT NULL,
-  `rol` enum('ADMIN','USUARIO') NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `mail` (`mail`)
+                           `id` bigint(20) NOT NULL AUTO_INCREMENT,
+                           `eliminado` tinyint(1) DEFAULT 0,
+                           `createdAt` datetime DEFAULT current_timestamp(),
+                           `nombre` varchar(100) NOT NULL,
+                           `apellido` varchar(100) NOT NULL,
+                           `mail` varchar(150) NOT NULL,
+                           `celular` varchar(20) DEFAULT NULL,
+                           `contrasena` varchar(255) DEFAULT NULL,
+                           `rol` enum('ADMIN','USUARIO') NOT NULL,
+                           PRIMARY KEY (`id`),
+                           UNIQUE KEY `mail` (`mail`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public abstract class Base {
     private Long id;
     private boolean eliminado;
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt; // Guarda el momento exacto en el que se creó el registro
 
     // Constructor vacío (siempre es buena práctica tenerlo)
     public Base() {

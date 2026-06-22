@@ -2,9 +2,18 @@
 
 Este proyecto consiste en un sistema enfocado en la gestión de un negocio de comidas aplicando principios de Programación Orientada a Objetos (POO).
 
+### Integrantes
+- Ibañez, Nicolás
+- Mendez, Maximiliano
+- Ortiz, Mailen
+
+1PRO1
+
+---
+
 ## Documentación
 
-- 
+- https://docs.google.com/document/d/1folJuZNXDK2PdzOmOCYilHBiD5gcilHN2lJXaKPb-UA/edit?usp=sharing
 
 ---
 

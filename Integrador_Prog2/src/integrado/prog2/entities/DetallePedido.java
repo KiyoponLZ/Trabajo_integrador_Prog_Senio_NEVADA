@@ -13,7 +13,7 @@ public class DetallePedido extends Base {
         this.producto = producto;
     }
 
-    // Generar Getters y Setters con IntelliJ
+    // Generar Getters y Setters
     public int getCantidad() { return cantidad; }
     public void setCantidad(int cantidad) { this.cantidad = cantidad; }
     public Double getSubtotal() { return subtotal; }
